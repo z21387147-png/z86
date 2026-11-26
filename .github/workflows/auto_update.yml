@@ -1,0 +1,32 @@
+name: 自動抓取新聞與計算風向分數
+
+on:
+  schedule:
+    # 每小時的第 0 分鐘自動執行一次
+    - cron: '0 * * * *'
+  workflow_dispatch: # 讓你也可以隨時手動按按鈕立刻執行
+
+permissions:
+  contents: write # 允許機器人自動存檔回你的 GitHub
+
+jobs:
+  update-news:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 下載專案檔案
+        uses: actions/checkout@v4
+
+      - name: 設定 Python 環境
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 執行爬蟲與加減分計算
+        run: python scraper.py
+
+      - name: 自動存檔並推送更新
+        run: |
+          git config --global user.name "Auto News Bot"
+          git config --global user.email "bot@github.com"
+          git add auto_data.js
+          git diff --quiet && git diff --staged --quiet || (git commit -m "自動更新最新新聞與風向分數" && git push)
