@@ -10,44 +10,52 @@
     .controls { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
     button { background-color: #2c2c2c; color: #fff; border: 1px solid #444; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 14px; transition: 0.2s; }
     button:hover, button.active { background-color: #1890ff; border-color: #1890ff; }
-    table { width: 100%; max-width: 1200px; margin: 0 auto; border-collapse: collapse; background-color: #1e1e1e; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-    th, td { border: 1px solid #333; padding: 12px 10px; text-align: center; vertical-align: middle; }
-    th { background-color: #262626; color: #ddd; font-size: 15px; }
+    table { width: 100%; max-width: 1320px; margin: 0 auto; border-collapse: collapse; background-color: #1e1e1e; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+    th, td { border: 1px solid #333; padding: 12px 8px; text-align: center; vertical-align: middle; }
+    th { background-color: #262626; color: #ddd; font-size: 14px; }
     tr:hover { background-color: #252525; }
-    .badge { padding: 4px 8px; border-radius: 4px; font-size: 13px; font-weight: bold; display: inline-block; }
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-block; }
     .status-tossup { background-color: rgba(250, 173, 20, 0.2); color: #ffc53d; border: 1px solid #ffc53d; }
     .status-blue { background-color: rgba(24, 144, 255, 0.2); color: #40a9ff; border: 1px solid #40a9ff; }
     .status-green { background-color: rgba(82, 196, 26, 0.2); color: #73d13d; border: 1px solid #73d13d; }
     .status-coalition { background-color: rgba(19, 194, 194, 0.2); color: #36cfc9; border: 1px solid #36cfc9; }
-    .kmt { color: #40a9ff; font-weight: bold; }
-    .dpp { color: #73d13d; font-weight: bold; }
-    .tpp { color: #36cfc9; font-weight: bold; }
-    .ind { color: #e6f7ff; font-weight: bold; }
+    .kmt { color: #40a9ff; font-weight: bold; font-size: 14px; }
+    .dpp { color: #73d13d; font-weight: bold; font-size: 14px; }
+    .tpp { color: #36cfc9; font-weight: bold; font-size: 14px; }
+    .ind { color: #e6f7ff; font-weight: bold; font-size: 14px; }
     .none-cand { color: #777; font-size: 13px; }
-    .poll-bar-container { width: 100%; height: 10px; background-color: #333; border-radius: 5px; overflow: hidden; display: flex; margin-top: 6px; }
+    .poll-bar-container { width: 100%; height: 8px; background-color: #333; border-radius: 4px; overflow: hidden; display: flex; margin-top: 6px; }
     .bar-kmt { background-color: #1890ff; height: 100%; }
     .bar-dpp { background-color: #52c41a; height: 100%; }
     .bar-other { background-color: #13c2c2; height: 100%; }
-    .poll-text { font-size: 13px; color: #ccc; }
+    .poll-text { font-size: 12px; color: #ccc; }
+
+    /* 社群平台專屬標籤 */
+    .social-list { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; text-align: left; }
+    .social-item { font-size: 12px; color: #e0e0e0; display: flex; align-items: center; gap: 5px; }
+    .plat-badge { padding: 1px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; min-width: 52px; text-align: center; }
+    .plat-Threads { background-color: #000000; color: #ffffff; border: 1px solid #666; }
+    .plat-FB { background-color: #1877f2; color: #ffffff; }
+    .plat-IG { background: linear-gradient(45deg, #f09433 0%, #dc2743 50%, #bc1888 100%); color: #ffffff; }
 
     /* 滑鼠懸停提示框 (Tooltip) */
-    .hover-trigger { position: relative; cursor: pointer; display: inline-block; border-bottom: 1px dashed #888; padding-bottom: 2px; font-size: 14px; }
+    .hover-trigger { position: relative; cursor: pointer; display: inline-block; border-bottom: 1px dashed #888; padding-bottom: 2px; font-size: 13px; }
     .hover-trigger .tooltip {
-      visibility: hidden; width: 310px; background-color: #0a0a0a; color: #fff; text-align: left;
+      visibility: hidden; width: 320px; background-color: #0a0a0a; color: #fff; text-align: left;
       border: 1px solid #666; border-radius: 6px; padding: 10px 12px; font-size: 13px; line-height: 1.5;
       position: absolute; z-index: 100; bottom: 130%; left: 50%; transform: translateX(-50%);
       opacity: 0; transition: opacity 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.9);
     }
-    .news-col .tooltip { left: auto; right: 0; transform: none; }
+    .right-col .tooltip { left: auto; right: 0; transform: none; }
     .hover-trigger:hover .tooltip { visibility: visible; opacity: 1; }
     .tooltip-title { color: #ffc53d; font-weight: bold; margin-bottom: 5px; display: block; border-bottom: 1px solid #333; padding-bottom: 3px; }
-    .poll-list { margin: 0; padding-left: 0; list-style: none; color: #e6f7ff; }
+    .detail-list div { margin-bottom: 4px; color: #e6f7ff; }
   </style>
 </head>
 <body>
 
   <h1>2026 台灣 22 縣市長選舉戰情總覽</h1>
-  <div class="subtitle">投票日：2026/11/28（六）｜滑鼠移至「封關民調」可比較 TVBS / 信民 / ETtoday / TPOC 多機構數據</div>
+  <div class="subtitle">投票日：2026/11/28（六）｜滑鼠移至「封關民調」、「社群聲勢」或「新聞」可看多來源數據與網路爆料</div>
 
   <div class="controls">
     <button class="active" onclick="filterTable('all', this)">全部 22 縣市</button>
@@ -62,18 +70,18 @@
   <table>
     <thead>
       <tr>
-        <th width="9%">縣市</th>
-        <th width="14%">選情局勢</th>
-        <th width="20%">藍營 / 在野整合</th>
-        <th width="20%">綠營 / 合作人選</th>
-        <th width="22%">封關支持度對照 (滑鼠移入看細節)</th>
-        <th width="15%">最新新聞動態</th>
+        <th width="8%">縣市</th>
+        <th width="12%">選情局勢</th>
+        <th width="17%">藍營 / 在野整合</th>
+        <th width="17%">綠營 / 合作人選</th>
+        <th width="18%">封關民調對照</th>
+        <th width="16%">📱 Threads / FB / IG 聲勢與爆料</th>
+        <th width="12%">最新新聞動態</th>
       </tr>
     </thead>
     <tbody id="election-tbody"></tbody>
   </table>
 
-  <!-- 載入獨立的資料庫檔案 -->
   <script src="data.js"></script>
   <script>
     function renderTable(filter = 'all') {
@@ -96,7 +104,15 @@
         const greenWidth = (item.greenPct / total) * 100;
         const barColorClass = item.blueClass === 'tpp' ? 'bar-other' : 'bar-kmt';
         const rightBarClass = (item.greenClass === 'ind' || item.greenClass === 'none-cand') ? 'bar-other' : 'bar-dpp';
+        
         const pollListHtml = item.pollCompare.map(line => `<div>${line}</div>`).join('');
+        const socialDetailHtml = item.socialDetail.map(line => `<div>${line}</div>`).join('');
+        const socialTagsHtml = item.socialTags.map(tag => `
+          <div class="social-item">
+            <span class="plat-badge plat-${tag.platform}">${tag.platform}</span>
+            <span>${tag.text}</span>
+          </div>
+        `).join('');
 
         const row = `
           <tr>
@@ -109,7 +125,7 @@
                 <span class="poll-text">📊 ${item.pollNote}</span>
                 <div class="tooltip">
                   <span class="tooltip-title">${item.city}｜各家機構數據對照</span>
-                  <div class="poll-list">${pollListHtml}</div>
+                  <div class="detail-list">${pollListHtml}</div>
                 </div>
               </div>
               <div class="poll-bar-container">
@@ -117,7 +133,16 @@
                 <div class="${rightBarClass}" style="width: ${greenWidth}%"></div>
               </div>
             </td>
-            <td class="news-col">
+            <td>
+              <div class="hover-trigger" style="border-bottom: none; width: 100%;">
+                <div class="social-list">${socialTagsHtml}</div>
+                <div class="tooltip">
+                  <span class="tooltip-title">${item.city}｜三大社群風向與爆料明細</span>
+                  <div class="detail-list">${socialDetailHtml}</div>
+                </div>
+              </div>
+            </td>
+            <td class="right-col">
               <div class="hover-trigger">
                 📰 ${item.newsHeadline}
                 <div class="tooltip">
