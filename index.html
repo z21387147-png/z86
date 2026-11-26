@@ -11,7 +11,7 @@
     .controls { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
     button { background-color: #2c2c2c; color: #fff; border: 1px solid #444; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 14px; transition: 0.2s; }
     button:hover, button.active { background-color: #1890ff; border-color: #1890ff; }
-    table { width: 100%; max-width: 1360px; margin: 0 auto; border-collapse: collapse; background-color: #1e1e1e; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+    table { width: 100%; max-width: 1380px; margin: 0 auto; border-collapse: collapse; background-color: #1e1e1e; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
     th, td { border: 1px solid #333; padding: 12px 8px; text-align: center; vertical-align: middle; }
     th { background-color: #262626; color: #ddd; font-size: 14px; }
     tr:hover { background-color: #252525; }
@@ -20,7 +20,14 @@
     .status-blue { background-color: rgba(24, 144, 255, 0.2); color: #40a9ff; border: 1px solid #40a9ff; }
     .status-green { background-color: rgba(82, 196, 26, 0.2); color: #73d13d; border: 1px solid #73d13d; }
     .status-coalition { background-color: rgba(19, 194, 194, 0.2); color: #36cfc9; border: 1px solid #36cfc9; }
-    .bot-score { margin-top: 5px; font-size: 11px; padding: 2px 6px; border-radius: 4px; display: inline-block; background-color: #2a2a2a; border: 1px solid #555; color: #36cfc9; }
+    .bot-summary { margin-top: 5px; font-size: 11px; padding: 2px 6px; border-radius: 4px; display: inline-block; background-color: #2a2a2a; border: 1px solid #555; color: #ddd; }
+
+    /* 候選人專屬加減分標籤 */
+    .cand-score { margin-top: 5px; font-size: 11px; padding: 2px 7px; border-radius: 10px; display: inline-block; font-weight: bold; cursor: pointer; }
+    .score-pos { background-color: rgba(82, 196, 26, 0.25); color: #95de64; border: 1px solid #52c41a; }
+    .score-neg { background-color: rgba(255, 77, 79, 0.25); color: #ff7875; border: 1px solid #ff4d4f; }
+    .score-zero { background-color: #2a2a2a; color: #aaa; border: 1px solid #555; }
+
     .kmt { color: #40a9ff; font-weight: bold; font-size: 14px; }
     .dpp { color: #73d13d; font-weight: bold; font-size: 14px; }
     .tpp { color: #36cfc9; font-weight: bold; font-size: 14px; }
@@ -38,12 +45,12 @@
     .plat-FB { background-color: #1877f2; color: #ffffff; }
     .plat-IG { background: linear-gradient(45deg, #f09433 0%, #dc2743 50%, #bc1888 100%); color: #ffffff; }
     .live-tag { background-color: #cf1322; color: #fff; font-size: 10px; padding: 1px 5px; border-radius: 3px; margin-right: 4px; vertical-align: middle; }
-    .hover-trigger { position: relative; cursor: pointer; display: inline-block; border-bottom: 1px dashed #888; padding-bottom: 2px; font-size: 13px; }
+    .hover-trigger { position: relative; cursor: pointer; display: inline-block; font-size: 13px; }
     .hover-trigger .tooltip {
-      visibility: hidden; width: 340px; background-color: #0a0a0a; color: #fff; text-align: left;
-      border: 1px solid #666; border-radius: 6px; padding: 10px 12px; font-size: 13px; line-height: 1.5;
+      visibility: hidden; width: 350px; background-color: #0a0a0a; color: #fff; text-align: left;
+      border: 1px solid #666; border-radius: 6px; padding: 10px 12px; font-size: 12px; line-height: 1.5;
       position: absolute; z-index: 100; bottom: 130%; left: 50%; transform: translateX(-50%);
-      opacity: 0; transition: opacity 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.9);
+      opacity: 0; transition: opacity 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.9); font-weight: normal;
     }
     .right-col .tooltip { left: auto; right: 0; transform: none; }
     .hover-trigger:hover .tooltip { visibility: visible; opacity: 1; }
@@ -55,7 +62,7 @@
 
   <h1>2026 台灣 22 縣市長選舉｜全自動戰情總覽</h1>
   <div class="subtitle">
-    投票日：2026/11/28（六）｜滑鼠移至「封關民調」、「社群聲勢」或「新聞」可看多來源數據與即時新聞<br>
+    滑鼠移至每位候選人下方的「加減分標籤」，可直接查看是哪則新聞造成加分或扣分<br>
     🤖 爬蟲機器人最後自動更新：<span id="update-time" class="update-badge">讀取中...</span>
   </div>
 
@@ -73,7 +80,7 @@
     <thead>
       <tr>
         <th width="8%">縣市</th>
-        <th width="13%">選情局勢 / 即時風向</th>
+        <th width="13%">選情局勢 / 近期風向</th>
         <th width="15%">藍營 / 在野整合</th>
         <th width="15%">綠營 / 合作人選</th>
         <th width="17%">封關民調對照</th>
@@ -84,7 +91,6 @@
     <tbody id="election-tbody"></tbody>
   </table>
 
-  <!-- 載入機器人每小時自動更新的資料 -->
   <script src="auto_data.js"></script>
   <script>
     const electionData = [
@@ -112,8 +118,23 @@
       { city: "連江縣", region: "other", area: "south_east", statusType: "blue", statusText: "🔵 藍營現任優勢", blueCand: "王忠銘 (國·現) vs 曹爾元 (無)", blueClass: "kmt", greenCand: "（民進黨未提名）", greenClass: "none-cand", bluePct: 56.0, greenPct: 44.0, pollNote: "現任縣長王忠銘對決無黨籍曹爾元", pollCompare: ["• 地方評估：現任縣長王忠銘執政優勢穩固"], socialTags: [{ platform: "FB", text: "馬祖資訊網交通熱議" }], socialDetail: ["• 【FB / 地方論壇】馬祖民眾高度關注台馬航線航班穩定。"], newsHeadline: "馬祖二強對決拚施政延續", newsDetail: "尋求連任的國民黨籍縣長王忠銘，對決無黨籍曹爾元。" }
     ];
 
-    // 顯示機器人最後更新時間
     document.getElementById('update-time').textContent = typeof lastUpdated !== 'undefined' ? lastUpdated : '等待首次排程更新';
+
+    function makeScoreBadge(score, logs, title) {
+      const cls = score > 0 ? 'score-pos' : (score < 0 ? 'score-neg' : 'score-zero');
+      const txt = score > 0 ? `+${score}分` : `${score}分`;
+      const logsHtml = (logs || []).map(l => `<div>• ${l}</div>`).join('');
+      return `
+        <br>
+        <div class="hover-trigger">
+          <span class="cand-score ${cls}">🤖 ${txt}</span>
+          <div class="tooltip">
+            <span class="tooltip-title">${title}｜加減分明細</span>
+            <div class="detail-list">${logsHtml}</div>
+          </div>
+        </div>
+      `;
+    }
 
     function renderTable(filter = 'all') {
       const tbody = document.getElementById('election-tbody');
@@ -130,8 +151,8 @@
       });
 
       filteredData.forEach(item => {
-        // 尋找機器人 autoData 裡面有沒有這個縣市的即時資料
         const liveItem = (typeof autoData !== 'undefined') ? autoData.find(a => a.city === item.city) : null;
+        const hasNewFormat = liveItem && typeof liveItem.blueScore !== 'undefined';
 
         const total = item.bluePct + item.greenPct;
         const blueWidth = (item.bluePct / total) * 100;
@@ -148,13 +169,15 @@
           </div>
         `).join('');
 
-        // 如果有即時資料，掛上機器人風向徽章與最新 5 則新聞；否則顯示原本的靜態新聞
-        const botBadgeHtml = liveItem ? `<br><span class="bot-score">🤖 ${liveItem.statusText}</span>` : '';
+        const summaryHtml = hasNewFormat ? `<br><span class="bot-summary">${liveItem.summary}</span>` : '';
+        const blueBadge = hasNewFormat ? makeScoreBadge(liveItem.blueScore, liveItem.blueLogs, item.blueCand) : '';
+        const greenBadge = (hasNewFormat && item.greenClass !== 'none-cand') ? makeScoreBadge(liveItem.greenScore, liveItem.greenLogs, item.greenCand) : '';
+
         const newsTitleHtml = liveItem
           ? `<span class="live-tag">LIVE</span>${liveItem.latestHeadline}`
           : `📰 ${item.newsHeadline}`;
         const newsTooltipTitle = liveItem
-          ? `${item.city}｜🤖 機器人最新抓取 5 則新聞`
+          ? `${item.city}｜🤖 機器人最新抓取新聞`
           : `${item.city}最新戰況`;
         const newsTooltipBody = liveItem
           ? liveItem.allNews.map((n, i) => `<div>${i + 1}. ${n}</div>`).join('')
@@ -165,10 +188,10 @@
             <td><strong>${item.city}</strong></td>
             <td>
               <span class="badge status-${item.statusType}">${item.statusText}</span>
-              ${botBadgeHtml}
+              ${summaryHtml}
             </td>
-            <td class="${item.blueClass}">${item.blueCand}</td>
-            <td class="${item.greenClass}">${item.greenCand}</td>
+            <td class="${item.blueClass}">${item.blueCand}${blueBadge}</td>
+            <td class="${item.greenClass}">${item.greenCand}${greenBadge}</td>
             <td>
               <div class="hover-trigger">
                 <span class="poll-text">📊 ${item.pollNote}</span>
@@ -183,7 +206,7 @@
               </div>
             </td>
             <td>
-              <div class="hover-trigger" style="border-bottom: none; width: 100%;">
+              <div class="hover-trigger" style="width: 100%;">
                 <div class="social-list">${socialTagsHtml}</div>
                 <div class="tooltip">
                   <span class="tooltip-title">${item.city}｜三大社群風向與爆料明細</span>
