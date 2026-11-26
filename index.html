@@ -2,15 +2,16 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <title>2026 台灣 22 縣市長選舉戰情總覽</title>
+  <title>2026 台灣 22 縣市長選舉｜全自動戰情總覽</title>
   <style>
     body { background-color: #121212; color: #ffffff; font-family: "Microsoft JhengHei", sans-serif; padding: 20px; margin: 0; }
     h1 { text-align: center; margin-bottom: 5px; }
-    .subtitle { text-align: center; color: #aaa; font-size: 14px; margin-bottom: 20px; }
+    .subtitle { text-align: center; color: #aaa; font-size: 14px; margin-bottom: 20px; line-height: 1.6; }
+    .update-badge { color: #36cfc9; font-weight: bold; }
     .controls { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
     button { background-color: #2c2c2c; color: #fff; border: 1px solid #444; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 14px; transition: 0.2s; }
     button:hover, button.active { background-color: #1890ff; border-color: #1890ff; }
-    table { width: 100%; max-width: 1320px; margin: 0 auto; border-collapse: collapse; background-color: #1e1e1e; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+    table { width: 100%; max-width: 1360px; margin: 0 auto; border-collapse: collapse; background-color: #1e1e1e; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
     th, td { border: 1px solid #333; padding: 12px 8px; text-align: center; vertical-align: middle; }
     th { background-color: #262626; color: #ddd; font-size: 14px; }
     tr:hover { background-color: #252525; }
@@ -19,6 +20,7 @@
     .status-blue { background-color: rgba(24, 144, 255, 0.2); color: #40a9ff; border: 1px solid #40a9ff; }
     .status-green { background-color: rgba(82, 196, 26, 0.2); color: #73d13d; border: 1px solid #73d13d; }
     .status-coalition { background-color: rgba(19, 194, 194, 0.2); color: #36cfc9; border: 1px solid #36cfc9; }
+    .bot-score { margin-top: 5px; font-size: 11px; padding: 2px 6px; border-radius: 4px; display: inline-block; background-color: #2a2a2a; border: 1px solid #555; color: #36cfc9; }
     .kmt { color: #40a9ff; font-weight: bold; font-size: 14px; }
     .dpp { color: #73d13d; font-weight: bold; font-size: 14px; }
     .tpp { color: #36cfc9; font-weight: bold; font-size: 14px; }
@@ -35,9 +37,10 @@
     .plat-Threads { background-color: #000000; color: #ffffff; border: 1px solid #666; }
     .plat-FB { background-color: #1877f2; color: #ffffff; }
     .plat-IG { background: linear-gradient(45deg, #f09433 0%, #dc2743 50%, #bc1888 100%); color: #ffffff; }
+    .live-tag { background-color: #cf1322; color: #fff; font-size: 10px; padding: 1px 5px; border-radius: 3px; margin-right: 4px; vertical-align: middle; }
     .hover-trigger { position: relative; cursor: pointer; display: inline-block; border-bottom: 1px dashed #888; padding-bottom: 2px; font-size: 13px; }
     .hover-trigger .tooltip {
-      visibility: hidden; width: 320px; background-color: #0a0a0a; color: #fff; text-align: left;
+      visibility: hidden; width: 340px; background-color: #0a0a0a; color: #fff; text-align: left;
       border: 1px solid #666; border-radius: 6px; padding: 10px 12px; font-size: 13px; line-height: 1.5;
       position: absolute; z-index: 100; bottom: 130%; left: 50%; transform: translateX(-50%);
       opacity: 0; transition: opacity 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.9);
@@ -45,13 +48,16 @@
     .right-col .tooltip { left: auto; right: 0; transform: none; }
     .hover-trigger:hover .tooltip { visibility: visible; opacity: 1; }
     .tooltip-title { color: #ffc53d; font-weight: bold; margin-bottom: 5px; display: block; border-bottom: 1px solid #333; padding-bottom: 3px; }
-    .detail-list div { margin-bottom: 4px; color: #e6f7ff; }
+    .detail-list div { margin-bottom: 5px; color: #e6f7ff; }
   </style>
 </head>
 <body>
 
-  <h1>2026 台灣 22 縣市長選舉戰情總覽</h1>
-  <div class="subtitle">投票日：2026/11/28（六）｜滑鼠移至「封關民調」、「社群聲勢」或「新聞」可看多來源數據與網路爆料</div>
+  <h1>2026 台灣 22 縣市長選舉｜全自動戰情總覽</h1>
+  <div class="subtitle">
+    投票日：2026/11/28（六）｜滑鼠移至「封關民調」、「社群聲勢」或「新聞」可看多來源數據與即時新聞<br>
+    🤖 爬蟲機器人最後自動更新：<span id="update-time" class="update-badge">讀取中...</span>
+  </div>
 
   <div class="controls">
     <button class="active" onclick="filterTable('all', this)">全部 22 縣市</button>
@@ -67,17 +73,19 @@
     <thead>
       <tr>
         <th width="8%">縣市</th>
-        <th width="12%">選情局勢</th>
-        <th width="17%">藍營 / 在野整合</th>
-        <th width="17%">綠營 / 合作人選</th>
-        <th width="18%">封關民調對照</th>
-        <th width="16%">📱 Threads / FB / IG 聲勢與爆料</th>
-        <th width="12%">最新新聞動態</th>
+        <th width="13%">選情局勢 / 即時風向</th>
+        <th width="15%">藍營 / 在野整合</th>
+        <th width="15%">綠營 / 合作人選</th>
+        <th width="17%">封關民調對照</th>
+        <th width="16%">📱 Threads / FB / IG 聲勢</th>
+        <th width="16%">最新新聞動態 (自動更新)</th>
       </tr>
     </thead>
     <tbody id="election-tbody"></tbody>
   </table>
 
+  <!-- 載入機器人每小時自動更新的資料 -->
+  <script src="auto_data.js"></script>
   <script>
     const electionData = [
       { city: "台北市", region: "six", area: "north", statusType: "tossup", statusText: "🔥 五五波激戰", blueCand: "蔣萬安 (國·現)", blueClass: "kmt", greenCand: "沈伯洋 (民)", greenClass: "dpp", bluePct: 46.0, greenPct: 44.7, pollNote: "多數調查在誤差內，中立選民成關鍵", pollCompare: ["• TVBS封關：蔣萬安 46% vs 沈伯洋 44%", "• ETtoday：蔣萬安 48.1% vs 沈伯洋 42.0%", "• 信民協會：沈伯洋 48.6% vs 蔣萬安 33.8%"], socialTags: [{ platform: "Threads", text: "沈佔優 / 假帳號洗版" }, { platform: "FB", text: "蔣佔優 / 辯論攻防" }, { platform: "IG", text: "青年圖文五五波" }], socialDetail: ["• 【Threads 爆料】逾2400個可疑帳號散播AI抹黑沈伯洋霸凌假影片遭Meta停用。", "• 【FB 攻防】藍營猛攻黑熊學院經費爭議；綠營反擊市政停滯。"], newsHeadline: "沈伯洋取消選前之夜", newsDetail: "沈伯洋宣布取消仁愛路選前之夜實體晚會避免交管；蔣萬安表示願讓出市府路，邀盧秀燕北上站台。" },
@@ -104,6 +112,9 @@
       { city: "連江縣", region: "other", area: "south_east", statusType: "blue", statusText: "🔵 藍營現任優勢", blueCand: "王忠銘 (國·現) vs 曹爾元 (無)", blueClass: "kmt", greenCand: "（民進黨未提名）", greenClass: "none-cand", bluePct: 56.0, greenPct: 44.0, pollNote: "現任縣長王忠銘對決無黨籍曹爾元", pollCompare: ["• 地方評估：現任縣長王忠銘執政優勢穩固"], socialTags: [{ platform: "FB", text: "馬祖資訊網交通熱議" }], socialDetail: ["• 【FB / 地方論壇】馬祖民眾高度關注台馬航線航班穩定。"], newsHeadline: "馬祖二強對決拚施政延續", newsDetail: "尋求連任的國民黨籍縣長王忠銘，對決無黨籍曹爾元。" }
     ];
 
+    // 顯示機器人最後更新時間
+    document.getElementById('update-time').textContent = typeof lastUpdated !== 'undefined' ? lastUpdated : '等待首次排程更新';
+
     function renderTable(filter = 'all') {
       const tbody = document.getElementById('election-tbody');
       tbody.innerHTML = '';
@@ -119,6 +130,9 @@
       });
 
       filteredData.forEach(item => {
+        // 尋找機器人 autoData 裡面有沒有這個縣市的即時資料
+        const liveItem = (typeof autoData !== 'undefined') ? autoData.find(a => a.city === item.city) : null;
+
         const total = item.bluePct + item.greenPct;
         const blueWidth = (item.bluePct / total) * 100;
         const greenWidth = (item.greenPct / total) * 100;
@@ -134,10 +148,25 @@
           </div>
         `).join('');
 
+        // 如果有即時資料，掛上機器人風向徽章與最新 5 則新聞；否則顯示原本的靜態新聞
+        const botBadgeHtml = liveItem ? `<br><span class="bot-score">🤖 ${liveItem.statusText}</span>` : '';
+        const newsTitleHtml = liveItem
+          ? `<span class="live-tag">LIVE</span>${liveItem.latestHeadline}`
+          : `📰 ${item.newsHeadline}`;
+        const newsTooltipTitle = liveItem
+          ? `${item.city}｜🤖 機器人最新抓取 5 則新聞`
+          : `${item.city}最新戰況`;
+        const newsTooltipBody = liveItem
+          ? liveItem.allNews.map((n, i) => `<div>${i + 1}. ${n}</div>`).join('')
+          : `<div>${item.newsDetail}</div>`;
+
         const row = `
           <tr>
             <td><strong>${item.city}</strong></td>
-            <td><span class="badge status-${item.statusType}">${item.statusText}</span></td>
+            <td>
+              <span class="badge status-${item.statusType}">${item.statusText}</span>
+              ${botBadgeHtml}
+            </td>
             <td class="${item.blueClass}">${item.blueCand}</td>
             <td class="${item.greenClass}">${item.greenCand}</td>
             <td>
@@ -162,12 +191,12 @@
                 </div>
               </div>
             </td>
-            <td class="right-col">
+            <td class="right-col" style="text-align: left;">
               <div class="hover-trigger">
-                📰 ${item.newsHeadline}
+                ${newsTitleHtml}
                 <div class="tooltip">
-                  <span class="tooltip-title">${item.city}最新戰況</span>
-                  ${item.newsDetail}
+                  <span class="tooltip-title">${newsTooltipTitle}</span>
+                  <div class="detail-list">${newsTooltipBody}</div>
                 </div>
               </div>
             </td>
