@@ -5,100 +5,121 @@ import json
 import time
 from datetime import datetime, timezone, timedelta
 
-# 1. 全台灣 22 縣市追蹤清單
+# 1. 全台灣 22 縣市追蹤清單（明確拆分藍/綠關鍵字）
 TARGETS = [
-    {"city": "台北市", "query": "台北市長 蔣萬安 沈伯洋", "blue": "蔣萬安 (國·現)", "green": "沈伯洋 (民)"},
-    {"city": "新北市", "query": "新北市長 李四川 蘇巧慧", "blue": "李四川 (國·藍白合)", "green": "蘇巧慧 (民)"},
-    {"city": "桃園市", "query": "桃園市長 張善政 黃世杰", "blue": "張善政 (國·現)", "green": "黃世杰 (民)"},
-    {"city": "台中市", "query": "台中市長 江啟臣 何欣純", "blue": "江啟臣 (國)", "green": "何欣純 (民)"},
-    {"city": "台南市", "query": "台南市長 陳亭妃 謝龍介", "blue": "謝龍介 (國)", "green": "陳亭妃 (民)"},
-    {"city": "高雄市", "query": "高雄市長 柯志恩 賴瑞隆", "blue": "柯志恩 (國)", "green": "賴瑞隆 (民)"},
-    {"city": "基隆市", "query": "基隆市長 謝國樑 童子瑋", "blue": "謝國樑 (國·現)", "green": "童子瑋 (民)"},
-    {"city": "宜蘭縣", "query": "宜蘭縣長 吳宗憲 林國漳", "blue": "吳宗憲 (國·藍白合)", "green": "林國漳 (民)"},
-    {"city": "新竹縣", "query": "新竹縣長 徐欣瑩 鄭朝方", "blue": "徐欣瑩 (國)", "green": "鄭朝方 (民)"},
-    {"city": "新竹市", "query": "新竹市長 高虹安 莊競程", "blue": "高虹安 (無·現/藍白合)", "green": "莊競程 (民)"},
-    {"city": "苗栗縣", "query": "苗栗縣長 鍾東錦 陳品安", "blue": "鍾東錦 (國·現)", "green": "陳品安 (民)"},
-    {"city": "彰化縣", "query": "彰化縣長 魏平政 陳素月 邱建富", "blue": "魏平政 (國)", "green": "陳素月 (民) / 邱建富 (無)"},
-    {"city": "南投縣", "query": "南投縣長 許淑華 温世政", "blue": "許淑華 (國·現)", "green": "温世政 (民)"},
-    {"city": "雲林縣", "query": "雲林縣長 張嘉郡 劉建國", "blue": "張嘉郡 (國)", "green": "劉建國 (民)"},
-    {"city": "嘉義縣", "query": "嘉義縣長 蔡易餘 吳品叡", "blue": "吳品叡 (無·藍營支持)", "green": "蔡易餘 (民)"},
-    {"city": "嘉義市", "query": "嘉義市長 張啓楷 王美惠", "blue": "張啓楷 (眾·藍白合)", "green": "王美惠 (民)"},
-    {"city": "屏東縣", "query": "屏東縣長 周春米 蘇清泉", "blue": "蘇清泉 (國)", "green": "周春米 (民·現)"},
-    {"city": "花蓮縣", "query": "花蓮縣長 游淑貞 張峻 魏嘉賢", "blue": "游淑貞 (國) / 魏嘉賢 (無)", "green": "張峻 (無·綠營支持)"},
-    {"city": "台東縣", "query": "台東縣長 吳秀華 陳瑩", "blue": "吳秀華 (國)", "green": "陳瑩 (民)"},
-    {"city": "澎湖縣", "query": "澎湖縣長 吳淑瑾 陳振中 葉竹林", "blue": "陳振中 (國) / 葉竹林 (無)", "green": "吳淑瑾 (民)"},
-    {"city": "金門縣", "query": "金門縣長 陳玉珍 李文良", "blue": "陳玉珍 (國) / 李文良 (無)", "green": "（民進黨未提名）"},
-    {"city": "連江縣", "query": "連江縣長 王忠銘 曹爾元", "blue": "王忠銘 (國·現) vs 曹爾元 (無)", "green": "（民進黨未提名）"}
+    {"city": "台北市", "blue_key": "蔣萬安", "green_key": "沈伯洋"},
+    {"city": "新北市", "blue_key": "李四川", "green_key": "蘇巧慧"},
+    {"city": "桃園市", "blue_key": "張善政", "green_key": "黃世杰"},
+    {"city": "台中市", "blue_key": "江啟臣", "green_key": "何欣純"},
+    {"city": "台南市", "blue_key": "謝龍介", "green_key": "陳亭妃"},
+    {"city": "高雄市", "blue_key": "柯志恩", "green_key": "賴瑞隆"},
+    {"city": "基隆市", "blue_key": "謝國樑", "green_key": "童子瑋"},
+    {"city": "宜蘭縣", "blue_key": "吳宗憲", "green_key": "林國漳"},
+    {"city": "新竹縣", "blue_key": "徐欣瑩", "green_key": "鄭朝方"},
+    {"city": "新竹市", "blue_key": "高虹安", "green_key": "莊競程"},
+    {"city": "苗栗縣", "blue_key": "鍾東錦", "green_key": "陳品安"},
+    {"city": "彰化縣", "blue_key": "魏平政", "green_key": "陳素月"},
+    {"city": "南投縣", "blue_key": "許淑華", "green_key": "温世政"},
+    {"city": "雲林縣", "blue_key": "張嘉郡", "green_key": "劉建國"},
+    {"city": "嘉義縣", "blue_key": "吳品叡", "green_key": "蔡易餘"},
+    {"city": "嘉義市", "blue_key": "張啓楷", "green_key": "王美惠"},
+    {"city": "屏東縣", "blue_key": "蘇清泉", "green_key": "周春米"},
+    {"city": "花蓮縣", "blue_key": "游淑貞", "green_key": "張峻"},
+    {"city": "台東縣", "blue_key": "吳秀華", "green_key": "陳瑩"},
+    {"city": "澎湖縣", "blue_key": "陳振中", "green_key": "吳淑瑾"},
+    {"city": "金門縣", "blue_key": "陳玉珍", "green_key": ""},
+    {"city": "連江縣", "blue_key": "王忠銘", "green_key": ""}
 ]
 
-# 2. 設定風向加減分關鍵字規則
-POS_WORDS = ["領先", "大勝", "站台", "力挺", "合體", "爆滿", "政績", "肯定", "翻轉", "整合成功"]
-NEG_WORDS = ["爭議", "爆料", "抹黑", "假帳號", "網軍", "官司", "退選", "分裂", "落後", "挨批", "取消"]
+# 2. 分級加扣分規則（你隨時可以在這裡微調權重）
+POS_WEIGHTS = {
+    "大勝": 10, "爆滿": 8, "領先": 8, "整合成功": 8,
+    "合體": 5, "力挺": 5, "站台": 5, "政績": 4, "肯定": 4, "翻轉": 4
+}
+NEG_WEIGHTS = {
+    "貪污": -15, "賄選": -15, "起訴": -15, "性騷": -15,
+    "造假": -10, "錄音": -10, "官司": -8, "分裂": -8, "抹黑": -8, "假帳號": -8,
+    "爆料": -6, "爭議": -5, "挨批": -5, "失言": -5, "脫口": -5, "落後": -5,
+    "取消": -4, "酸": -4
+}
 
-def fetch_google_news(query):
-    """抓取 Google 新聞 RSS 最新 5 則標題"""
+def fetch_google_news(query, limit=3):
+    """抓取指定關鍵字的 Google 新聞 RSS 標題"""
+    if not query.strip():
+        return []
     encoded_q = urllib.parse.quote(query)
     url = f"https://news.google.com/rss/search?q={encoded_q}&hl=zh-TW&gl=TW&ceid=TW:zh-Hant"
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-    
     headlines = []
     try:
         with urllib.request.urlopen(req, timeout=10) as response:
-            xml_data = response.read()
-            root = ET.fromstring(xml_data)
-            for item in root.findall("./channel/item")[:5]:
-                title = item.find("title").text
-                headlines.append(title)
-    except Exception as e:
-        headlines.append(f"暫時無法取得新聞 ({e})")
+            root = ET.fromstring(response.read())
+            for item in root.findall("./channel/item")[:limit]:
+                headlines.append(item.find("title").text)
+    except Exception:
+        pass
     return headlines
 
-def calculate_score(headlines):
-    """根據新聞標題計算網路風向加減分"""
+def evaluate_candidate(cand_name, headlines):
+    """針對單一候選人的新聞計算分數並記錄原因"""
     score = 0
+    logs = []
     for title in headlines:
-        for word in POS_WORDS:
-            if word in title:
-                score += 5
-        for word in NEG_WORDS:
-            if word in title:
-                score -= 5
-    return score
+        hit_words = []
+        title_delta = 0
+        for w, pts in POS_WEIGHTS.items():
+            if w in title:
+                title_delta += pts
+                hit_words.append(f"+{pts}({w})")
+        for w, pts in NEG_WEIGHTS.items():
+            if w in title:
+                title_delta += pts
+                hit_words.append(f"{pts}({w})")
+        score += title_delta
+        tag = " ".join(hit_words) if hit_words else "中性(0)"
+        logs.append(f"【{tag}】{title}")
+    return score, logs
 
 def main():
     tw_time = datetime.now(timezone(timedelta(hours=8))).strftime("%Y/%m/%d %H:%M")
     results = []
 
     for t in TARGETS:
-        news_list = fetch_google_news(t["query"])
-        score = calculate_score(news_list)
-        
-        if score > 0:
-            status_text = f"📈 聲勢看漲 (+{score}分)"
-            status_type = "green"
-        elif score < 0:
-            status_text = f"📉 爭議偏多 ({score}分)"
-            status_type = "tossup"
+        city = t["city"]
+        b_news = fetch_google_news(f"{city} {t['blue_key']}", limit=3)
+        time.sleep(0.3)
+        g_news = fetch_google_news(f"{city} {t['green_key']}", limit=3) if t["green_key"] else []
+        time.sleep(0.3)
+
+        b_score, b_logs = evaluate_candidate(t["blue_key"], b_news)
+        g_score, g_logs = evaluate_candidate(t["green_key"], g_news)
+
+        # 綜合風向對比
+        diff = b_score - g_score
+        if diff > 0:
+            summary = f"🔵 藍營近期佔優 (+{diff})"
+        elif diff < 0:
+            summary = f"🟢 綠營近期佔優 (+{abs(diff)})"
         else:
-            status_text = "⚖️ 聲勢持平 (0分)"
-            status_type = "blue"
+            summary = "⚖️ 近期風向持平"
+
+        combined_news = (b_news[:2] + g_news[:2]) or ["尚無最新消息"]
 
         results.append({
-            "city": t["city"],
-            "statusType": status_type,
-            "statusText": status_text,
-            "blueCand": t["blue"],
-            "greenCand": t["green"],
-            "score": score,
-            "latestHeadline": news_list[0] if news_list else "尚無最新消息",
-            "allNews": news_list
+            "city": city,
+            "summary": summary,
+            "blueScore": b_score,
+            "blueLogs": b_logs if b_logs else ["近期無顯著加減分新聞"],
+            "greenScore": g_score,
+            "greenLogs": g_logs if g_logs else ["近期無顯著加減分新聞"],
+            "latestHeadline": combined_news[0],
+            "allNews": combined_news
         })
-        time.sleep(0.5) # 稍微停頓避免請求過快
 
     js_content = f"const lastUpdated = '{tw_time}';\nconst autoData = {json.dumps(results, ensure_ascii=False, indent=2)};\n"
     with open("auto_data.js", "w", encoding="utf-8") as f:
         f.write(js_content)
-    print(f"成功更新 22 縣市 auto_data.js！更新時間：{tw_time}")
+    print(f"成功更新 22 縣市候選人獨立評分！時間：{tw_time}")
 
 if __name__ == "__main__":
     main()
