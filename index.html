@@ -1,1 +1,361 @@
 
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>2026 台灣縣市長選舉戰情總覽</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: #ffffff;
+      font-family: "Microsoft JhengHei", sans-serif;
+      padding: 20px;
+      margin: 0;
+    }
+    h1 { text-align: center; margin-bottom: 5px; }
+    .subtitle { text-align: center; color: #aaa; font-size: 14px; margin-bottom: 20px; }
+
+    /* 篩選按鈕與圖例 */
+    .controls {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    button {
+      background-color: #2c2c2c;
+      color: #fff;
+      border: 1px solid #444;
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover, button.active {
+      background-color: #1890ff;
+      border-color: #1890ff;
+    }
+
+    /* 表格樣式 */
+    table {
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      border-collapse: collapse;
+      background-color: #1e1e1e;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+    th, td {
+      border: 1px solid #333;
+      padding: 12px 10px;
+      text-align: center;
+      vertical-align: middle;
+    }
+    th { background-color: #262626; color: #ddd; font-size: 15px; }
+    tr:hover { background-color: #252525; }
+
+    /* 選情狀態標籤 */
+    .badge {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: bold;
+      display: inline-block;
+    }
+    .status-tossup { background-color: rgba(250, 173, 20, 0.2); color: #ffc53d; border: 1px solid #ffc53d; } /* 五五波 */
+    .status-blue { background-color: rgba(24, 144, 255, 0.2); color: #40a9ff; border: 1px solid #40a9ff; }   /* 藍營領先 */
+    .status-green { background-color: rgba(82, 196, 26, 0.2); color: #73d13d; border: 1px solid #73d13d; }  /* 綠營領先 */
+    .status-coalition { background-color: rgba(19, 194, 194, 0.2); color: #36cfc9; border: 1px solid #36cfc9; } /* 藍白共推 */
+
+    /* 候選人與黨籍顏色 */
+    .kmt { color: #40a9ff; font-weight: bold; }
+    .dpp { color: #73d13d; font-weight: bold; }
+    .tpp { color: #36cfc9; font-weight: bold; }
+    .ind { color: #d9d9d9; font-weight: bold; }
+
+    /* 民調對比條 */
+    .poll-bar-container {
+      width: 100%;
+      height: 10px;
+      background-color: #333;
+      border-radius: 5px;
+      overflow: hidden;
+      display: flex;
+      margin-top: 6px;
+    }
+    .bar-kmt { background-color: #1890ff; height: 100%; }
+    .bar-dpp { background-color: #52c41a; height: 100%; }
+    .bar-other { background-color: #13c2c2; height: 100%; }
+    .poll-text { font-size: 13px; color: #ccc; }
+
+    /* 滑鼠懸停新聞提示框 (Tooltip) */
+    .news-trigger {
+      position: relative;
+      cursor: pointer;
+      display: inline-block;
+      border-bottom: 1px dashed #888;
+      padding-bottom: 2px;
+    }
+    .news-trigger .tooltip {
+      visibility: hidden;
+      width: 280px;
+      background-color: #000;
+      color: #fff;
+      text-align: left;
+      border: 1px solid #666;
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 13px;
+      line-height: 1.5;
+      position: absolute;
+      z-index: 100;
+      bottom: 130%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.2s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.8);
+    }
+    .news-trigger:hover .tooltip {
+      visibility: visible;
+      opacity: 1;
+    }
+    .tooltip-title {
+      color: #ffc53d;
+      font-weight: bold;
+      margin-bottom: 4px;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>2026 台灣縣市長選舉戰情總覽</h1>
+  <div class="subtitle">投票日：2026/11/28（六）｜數據為選前封關民調區間整理，滑鼠移至新聞焦點可看最新動態</div>
+
+  <!-- 篩選按鈕 -->
+  <div class="controls">
+    <button class="active" onclick="filterTable('all', this)">全部縣市</button>
+    <button onclick="filterTable('six', this)">六都戰區</button>
+    <button onclick="filterTable('tossup', this)">🔥 五五波激戰區</button>
+    <button onclick="filterTable('coalition', this)">🤝 藍白共推區</button>
+  </div>
+
+  <!-- 戰情表格 -->
+  <table>
+    <thead>
+      <tr>
+        <th width="10%">縣市</th>
+        <th width="14%">選情局勢</th>
+        <th width="20%">藍營 / 在野共推</th>
+        <th width="20%">綠營候選人</th>
+        <th width="22%">封關民調支持度 (%)</th>
+        <th width="14%">最新新聞動態</th>
+      </tr>
+    </thead>
+    <tbody id="election-tbody">
+      <!-- 資料將由下方 JavaScript 自動生成 -->
+    </tbody>
+  </table>
+
+  <script>
+    // 1. 選舉資料庫（未來可替換為 Python 爬蟲自動產生的 JSON 檔）
+    const electionData = [
+      {
+        city: "台北市",
+        region: "six",
+        statusType: "tossup",
+        statusText: "🔥 五五波激戰",
+        blueCand: "蔣萬安 (國·現)",
+        blueClass: "kmt",
+        greenCand: "沈伯洋 (民)",
+        greenClass: "dpp",
+        bluePct: 46.0,
+        greenPct: 44.7,
+        pollNote: "蔣 34~48% vs 沈 42~52% (多份在誤差內)",
+        newsHeadline: "沈伯洋取消選前之夜",
+        newsDetail: "【11/26 最新】沈伯洋宣布取消仁愛路選前之夜實體晚會，避免交管影響市民；蔣萬安表示願讓出市府路，並邀盧秀燕北上站台。"
+      },
+      {
+        city: "新北市",
+        region: "six",
+        statusType: "tossup",
+        statusText: "🔥 藍白合激戰",
+        blueCand: "李四川 (國·藍白合)",
+        blueClass: "kmt",
+        greenCand: "蘇巧慧 (民)",
+        greenClass: "dpp",
+        bluePct: 43.1,
+        greenPct: 44.0,
+        pollNote: "蘇 33~47% vs 李 30~43% (黃國昌退選輔選)",
+        newsHeadline: "雙北連動 vs 藍白聯手",
+        newsDetail: "【11/26 最新】民眾黨主席黃國昌民調整合退選後全力輔選李四川，李邀蔣萬安車掃；蘇巧慧主打雙北區域聯防衝刺。"
+      },
+      {
+        city: "桃園市",
+        region: "six",
+        statusType: "blue",
+        statusText: "🔵 藍營穩居領先",
+        blueCand: "張善政 (國·現)",
+        blueClass: "kmt",
+        greenCand: "黃世杰 (民)",
+        greenClass: "dpp",
+        bluePct: 47.4,
+        greenPct: 36.0,
+        pollNote: "張 37~47% vs 黃 33~36% (未表態約25%)",
+        newsHeadline: "張善政合體蔣萬安掃夜市",
+        newsDetail: "【11/26 最新】張善政在所有封關民調皆保持領先，選前與蔣萬安合體逛夜市拉票；黃世杰邀沈伯洋赴中壢車掃催票。"
+      },
+      {
+        city: "台中市",
+        region: "six",
+        statusType: "tossup",
+        statusText: "🔥 麻花捲肉搏",
+        blueCand: "江啟臣 (國)",
+        blueClass: "kmt",
+        greenCand: "何欣純 (民)",
+        greenClass: "dpp",
+        bluePct: 35.2,
+        greenPct: 39.3,
+        pollNote: "何 39~41% vs 江 30~35% (差距極小)",
+        newsHeadline: "藍綠互攻本命區太平車掃",
+        newsDetail: "【11/26 最新】選情進入肉搏戰，江啟臣直搗何欣純本命區太平車掃，何欣純同日也在太平由林楚茵陪同固票。"
+      },
+      {
+        city: "台南市",
+        region: "six",
+        statusType: "green",
+        statusText: "🟢 綠營大幅領先",
+        blueCand: "謝龍介 (國)",
+        blueClass: "kmt",
+        greenCand: "陳亭妃 (民)",
+        greenClass: "dpp",
+        bluePct: 22.6,
+        greenPct: 59.4,
+        pollNote: "陳 59.4% vs 謝 22.6% (差距逾36%)",
+        newsHeadline: "陳亭妃穩守基本盤",
+        newsDetail: "【選情動態】陳亭妃在封關民調大幅領先，持續鞏固基層組織；謝龍介主打在野監督力拚突破。"
+      },
+      {
+        city: "高雄市",
+        region: "six",
+        statusType: "tossup",
+        statusText: "🔥 差距縮小激戰",
+        blueCand: "柯志恩 (國)",
+        blueClass: "kmt",
+        greenCand: "賴瑞隆 (民)",
+        greenClass: "dpp",
+        bluePct: 46.1,
+        greenPct: 44.6,
+        pollNote: "各家調查分歧，封關民調出現1.5%內拉鋸",
+        newsHeadline: "藍綠封關民調互有領先",
+        newsDetail: "【選情動態】高雄封關民調出現拉鋸，ETtoday 顯示柯志恩微幅領先 1.5%，綠營民調則顯示賴瑞隆領先，雙方全力催出投票率。"
+      },
+      {
+        city: "新竹市",
+        region: "other",
+        statusType: "coalition",
+        statusText: "🤝 藍白現任優先",
+        blueCand: "高虹安 (無·現/藍白合)",
+        blueClass: "tpp",
+        greenCand: "莊競程 (民)",
+        greenClass: "dpp",
+        bluePct: 45.0,
+        greenPct: 38.0,
+        pollNote: "藍白協議禮讓現任，對決綠營莊競程",
+        newsHeadline: "高虹安端大新竹輕軌政見",
+        newsDetail: "【11/26 最新】高虹安提出大新竹輕軌地下化政見爭取連任；莊競程合體沈伯洋造勢全力搶攻科技選票。"
+      },
+      {
+        city: "嘉義市",
+        region: "other",
+        statusType: "coalition",
+        statusText: "🤝 藍白民調整合",
+        blueCand: "張啓楷 (眾·藍白合)",
+        blueClass: "tpp",
+        greenCand: "王美惠 (民)",
+        greenClass: "dpp",
+        bluePct: 41.0,
+        greenPct: 43.0,
+        pollNote: "藍白民調整合共推張啓楷，激戰王美惠",
+        newsHeadline: "學界與地方人士站台張啓楷",
+        newsDetail: "【11/26 最新】張啓楷造勢晚會獲清大退休教授李敏及前綠委林國慶站台；王美惠主打地方服務口碑迎戰。"
+      },
+      {
+        city: "宜蘭縣",
+        region: "other",
+        statusType: "coalition",
+        statusText: "🤝 藍白民調整合",
+        blueCand: "吳宗憲 (國·藍白合)",
+        blueClass: "kmt",
+        greenCand: "林國漳 (民)",
+        greenClass: "dpp",
+        bluePct: 42.0,
+        greenPct: 40.0,
+        pollNote: "藍白整合共推吳宗憲，對決律師林國漳",
+        newsHeadline: "北北宜桃區域聯防連線",
+        newsDetail: "【選情動態】林國漳加入民進黨北北宜桃區域聯防連線造勢；吳宗憲獲藍白整合力挺力守宜蘭。"
+      }
+    ];
+
+    // 2. 將資料渲染成表格畫面的函式
+    function renderTable(filter = 'all') {
+      const tbody = document.getElementById('election-tbody');
+      tbody.innerHTML = ''; // 清空表格
+
+      const filteredData = electionData.filter(item => {
+        if (filter === 'all') return true;
+        if (filter === 'six') return item.region === 'six';
+        if (filter === 'tossup') return item.statusType === 'tossup';
+        if (filter === 'coalition') return item.statusType === 'coalition';
+      });
+
+      filteredData.forEach(item => {
+        // 計算進度條比例
+        const total = item.bluePct + item.greenPct;
+        const blueWidth = (item.bluePct / total) * 100;
+        const greenWidth = (item.greenPct / total) * 100;
+        const barColorClass = item.blueClass === 'tpp' ? 'bar-other' : 'bar-kmt';
+
+        const row = `
+          <tr>
+            <td><strong>${item.city}</strong></td>
+            <td><span class="badge status-${item.statusType}">${item.statusText}</span></td>
+            <td class="${item.blueClass}">${item.blueCand}</td>
+            <td class="${item.greenClass}">${item.greenCand}</td>
+            <td>
+              <div class="poll-text">${item.pollNote}</div>
+              <div class="poll-bar-container">
+                <div class="${barColorClass}" style="width: ${blueWidth}%"></div>
+                <div class="bar-dpp" style="width: ${greenWidth}%"></div>
+              </div>
+            </td>
+            <td>
+              <div class="news-trigger">
+                📰 ${item.newsHeadline}
+                <div class="tooltip">
+                  <span class="tooltip-title">${item.city}最新戰況</span>
+                  ${item.newsDetail}
+                </div>
+              </div>
+            </td>
+          </tr>
+        `;
+        tbody.innerHTML += row;
+      });
+    }
+
+    // 3. 切換篩選按鈕的功能
+    function filterTable(type, btnElement) {
+      document.querySelectorAll('.controls button').forEach(btn => btn.classList.remove('active'));
+      btnElement.classList.add('active');
+      renderTable(type);
+    }
+
+    // 網頁載入時自動執行一次
+    renderTable();
+  </script>
+
+</body>
+</html>
