@@ -22,7 +22,9 @@ jobs:
           python-version: '3.11'
 
       - name: 執行爬蟲與加減分計算
-        run: python scraper.py
+        run: |
+  cd docs
+  python scraper.py
 
       - name: 自動存檔並推送更新
         run: |
